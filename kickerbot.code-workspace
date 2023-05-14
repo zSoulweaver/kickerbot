@@ -1,0 +1,24 @@
+{
+	"folders": [
+		{
+			"name": "✨ @kickerbot/root",
+			"path": "."
+		},
+		{
+			"name": "🚀 @kickerbot/nest-bot",
+			"path": "apps/nest-bot"
+		},
+		{
+			"name": "🚀 @kickerbot/playground",
+			"path": "apps/playground"
+		},
+		{
+			"name": "📦 @kickerbot/kclient",
+			"path": "packages/kclient"
+		}
+	],
+	"settings": {
+		"typescript.tsdk": "✨ @kickerbot\\root\\node_modules\\typescript\\lib",
+		"typescript.tsserver.experimental.enableProjectDiagnostics": true
+	}
+}

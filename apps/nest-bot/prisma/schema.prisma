@@ -1,0 +1,40 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PermissionLevel {
+  VIEWER
+  REGULAR
+  SUBSCRIBER
+  MODERATOR
+  ADMIN
+  BROADCASTER
+}
+
+model CommandPermission {
+  command    String          @id
+  permission PermissionLevel @default(VIEWER)
+}
+
+model Viewer {
+  id         Int             @id
+  username   String
+  permission PermissionLevel @default(VIEWER)
+  points     Int             @default(0)
+}
+
+model ModuleSettings {
+  module  String
+  setting String
+  value   String
+
+  @@id([module, setting])
+}
