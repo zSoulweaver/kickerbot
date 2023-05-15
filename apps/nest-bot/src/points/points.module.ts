@@ -4,8 +4,9 @@ import { PermissionsModule } from 'src/permissions/permissions.module'
 import { PointsService } from './points.service'
 import { PrismaService } from 'src/prisma.service'
 import { SettingsModule } from 'src/settings/settings.module'
-import { SettingsService } from 'src/settings/settings.service'
+import { SettingsObject, SettingsService } from 'src/settings/settings.service'
 import { minutesToMilliseconds } from 'date-fns'
+import { PointsSettings } from './points.settings'
 
 @Module({
   imports: [
@@ -27,10 +28,10 @@ export class PointsModule implements OnModuleInit {
   ) { }
 
   async onModuleInit() {
-    const defaultSettings = {
-      pointName: 'points',
-      pointGain: 5,
-      pointGainTime: minutesToMilliseconds(1)
+    const defaultSettings: SettingsObject<PointsSettings> = {
+      pointsName: 'points',
+      pointsGain: 5,
+      pointsGainTime: minutesToMilliseconds(1)
     }
 
     for (const setting in defaultSettings) {

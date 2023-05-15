@@ -3,6 +3,7 @@ import { Cron } from '@nestjs/schedule'
 import { PrismaService } from 'src/prisma.service'
 import { SettingsService } from 'src/settings/settings.service'
 import { ViewerActivityService } from 'src/viewers/viewer-activity.service'
+import { PointsSettings } from './points.settings'
 
 @Injectable()
 export class PointsService {
@@ -11,7 +12,7 @@ export class PointsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly viewerActivityService: ViewerActivityService,
-    private readonly settingsService: SettingsService
+    private readonly settingsService: SettingsService<PointsSettings>
   ) { }
 
   async setPoints(username: string, points: number) {
@@ -47,7 +48,7 @@ export class PointsService {
       return
     }
 
-    const pointIncrementValue = await this.settingsService.getSetting('pointGain')
+    const pointIncrementValue = await this.settingsService.getSetting('pointsGain')
 
     const pointTransactions: any[] = []
     for (const viewer of activeViewers) {

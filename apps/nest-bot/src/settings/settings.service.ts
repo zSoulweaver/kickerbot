@@ -2,15 +2,19 @@ import { Inject, Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma.service'
 import { SETTINGS_MODULE_NAME_METADATA } from './settings.constants'
 
+export type SettingsObject<T extends string> = {
+  [K in T]: string | number
+}
+
 @Injectable()
-export class SettingsService {
+export class SettingsService<T extends string = string> {
   constructor(
     @Inject(SETTINGS_MODULE_NAME_METADATA)
     private readonly moduleName: string,
     private readonly prisma: PrismaService
   ) { }
 
-  async getSetting(setting: string, module?: string) {
+  async getSetting(setting: T, module?: string) {
     const moduleSetting = await this.prisma.moduleSettings.findFirst({
       where: {
         module: module ?? this.moduleName,
