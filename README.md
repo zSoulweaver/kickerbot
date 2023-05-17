@@ -1,7 +1,8 @@
-# 👋 Hi, I'm Kickerbot <font size="1">name + readme in progress</font>
+# 👋 Hi, I'm Kickerbot
+###### Name in progress
 
 ### Free Kick.com chat bot build on NodeJS using the awesome NestJS library.
-<br>
+___
 
 In this repo you'll also find a client library, KClient, to interact with the private Kick.com API using Playwright to get around the aggressive Cloudflare blocking.
 
