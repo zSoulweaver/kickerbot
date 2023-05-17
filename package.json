@@ -1,5 +1,6 @@
 {
   "name": "@kickerbot/root",
+  "license": "GPL-3.0-or-later",
   "private": true,
   "workspaces": [
     "packages/*",

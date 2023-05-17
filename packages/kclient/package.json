@@ -1,6 +1,7 @@
 {
   "name": "@kickerbot/kclient",
   "version": "1.0.0",
+  "license": "GPL-3.0-or-later",
   "private": true,
   "main": "dist/index",
   "types": "dist/index",
