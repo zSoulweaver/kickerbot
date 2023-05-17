@@ -1,12 +1,16 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, UseGuards } from '@nestjs/common'
 import { Arguments, ArgumentsPipe, Command, CommandContext, CommandGroup, CommandsService, Context } from 'src/kicker'
 import { TimersService } from './timers.service'
 import { TimersSetInput } from './dto/timers-set.input'
 import { ChatMessageEvent } from '@kickerbot/kclient'
 import { TimersRemoveInput } from './dto/timers-remove.input'
+import { RoleGuard } from 'src/permissions/role.guard'
+import { DefaultRole } from 'src/permissions/default-role.decorator'
+import { PermissionLevel } from '@prisma/client'
 
 @Injectable()
 @CommandGroup({ name: 'timers' })
+@UseGuards(RoleGuard)
 export class TimersCommands {
   constructor(
     private readonly timersService: TimersService,
@@ -14,6 +18,7 @@ export class TimersCommands {
   ) { }
 
   @Command({ name: 'set' })
+  @DefaultRole(PermissionLevel.MODERATOR)
   public addTimerCommand(
     @Arguments(ArgumentsPipe) args: TimersSetInput,
     @Context() [ctx]: CommandContext
@@ -31,6 +36,7 @@ export class TimersCommands {
   }
 
   @Command({ name: 'remove' })
+  @DefaultRole(PermissionLevel.MODERATOR)
   public removeTimerCommand(@Arguments(ArgumentsPipe) args: TimersRemoveInput) {
     const handler = this.commandsService.getCommandHandler(args.command)
     if (!handler) {
