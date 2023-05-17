@@ -1,5 +1,5 @@
 import { Injectable, UseGuards } from '@nestjs/common'
-import { Arguments, ArgumentsPipe, Command, CommandContext, CommandGroup, CommandsService, Context } from 'src/kicker'
+import { Arguments, Command, CommandContext, CommandGroup, CommandsService, Context } from 'src/kicker'
 import { TimersService } from './timers.service'
 import { TimersSetInput } from './dto/timers-set.input'
 import { ChatMessageEvent } from '@kickerbot/kclient'
@@ -20,7 +20,7 @@ export class TimersCommands {
   @Command({ name: 'set' })
   @DefaultRole(PermissionLevel.MODERATOR)
   public addTimerCommand(
-    @Arguments(ArgumentsPipe) args: TimersSetInput,
+    @Arguments args: TimersSetInput,
     @Context() [ctx]: CommandContext
   ) {
     const handler = this.commandsService.getCommandHandler(args.command)
@@ -37,7 +37,7 @@ export class TimersCommands {
 
   @Command({ name: 'remove' })
   @DefaultRole(PermissionLevel.MODERATOR)
-  public removeTimerCommand(@Arguments(ArgumentsPipe) args: TimersRemoveInput) {
+  public removeTimerCommand(@Arguments args: TimersRemoveInput) {
     const handler = this.commandsService.getCommandHandler(args.command)
     if (!handler) {
       return 'Specified command doesn\'t exist'

@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common'
-import { Arguments, Command, CommandContext, Context } from './kicker'
+import { Command, CommandContext, Context, LooseArguments } from './kicker'
 
 @Injectable()
 export class AppService {
   @Command({ name: 'ping' })
-  public onPing(@Context() [messageData]: CommandContext, @Arguments() args: string[]) {
+  public onPing(@Context() [messageData]: CommandContext, @LooseArguments() args: string[]) {
     return 'Pong'
   }
 }

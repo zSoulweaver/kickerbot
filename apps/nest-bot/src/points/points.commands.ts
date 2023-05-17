@@ -1,5 +1,5 @@
 import { Injectable, UseGuards } from '@nestjs/common'
-import { Arguments, ArgumentsPipe, Command, CommandGroup, Sender } from 'src/kicker'
+import { Arguments, Command, CommandGroup, Sender } from 'src/kicker'
 import { RoleGuard } from 'src/permissions/role.guard'
 import { SettingsService } from 'src/settings/settings.service'
 import { PointsGetInput } from './dto/points-get.dto'
@@ -20,7 +20,7 @@ export class PointsCommands {
   @Command({ name: '' })
   @UseGuards(RoleGuard)
   async getUserPoints(
-    @Arguments(ArgumentsPipe) args: PointsGetInput,
+    @Arguments args: PointsGetInput,
     @Sender() sender: ChatMessageEvent['sender']
   ) {
     const targetUser = args.username ?? sender.username
@@ -29,14 +29,14 @@ export class PointsCommands {
   }
 
   @Command({ name: 'set' })
-  async setUserPoints(@Arguments(ArgumentsPipe) args: PointsSetInput) {
+  async setUserPoints(@Arguments args: PointsSetInput) {
     await this.pointsService.setPoints(args.username, args.points)
     return `Set points for ${args.username} to ${args.points}`
   }
 
   @Command({ name: 'name set' })
   @DefaultRole('MODERATOR')
-  async setPointsName(@Arguments(ArgumentsPipe) args: PointsNameSetInput) {
+  async setPointsName(@Arguments args: PointsNameSetInput) {
     await this.settingsService.set('pointsName', args.name)
     return `Current points name has been set to "${args.name}"`
   }
