@@ -25,7 +25,8 @@ export class PointsCommands {
   ) {
     const targetUser = args.username ?? sender.username
     const points = await this.pointsService.getPoints(targetUser)
-    return `${targetUser} currenly has ${points ?? 0} points`
+    const pointName = await this.settingsService.getSetting('pointsName') ?? 'points'
+    return `${targetUser} currenly has ${points ?? 0} ${pointName}`
   }
 
   @Command({ name: 'set' })
