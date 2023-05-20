@@ -193,6 +193,14 @@ export class CommandsService implements OnModuleInit, OnApplicationBootstrap {
   }
 
   public remove(name: string) {
-    this.commands.delete(name)
+    this.commands.delete(name.toLowerCase())
+  }
+
+  public addManual(rootName: string, mapValue: CommandDiscovery | CommandGroupMap) {
+    this.commands.set(rootName.toLowerCase(), mapValue)
+  }
+
+  public getElement(name: string) {
+    return this.commands.get(name.toLowerCase())
   }
 }

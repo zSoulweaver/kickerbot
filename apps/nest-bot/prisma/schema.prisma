@@ -38,3 +38,8 @@ model ModuleSettings {
 
   @@id([module, setting])
 }
+
+model CommandAliases {
+  target String
+  alias  String @id
+}

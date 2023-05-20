@@ -10,6 +10,7 @@ import { TimersModule } from './timers/timers.module'
 import { TypedConfigModule, fileLoader } from 'nest-typed-config'
 import { AppConfig } from './app.config'
 import { deserialize } from '@deepkit/type'
+import { AliasModule } from './alias/alias.module'
 
 @Module({
   imports: [
@@ -28,7 +29,8 @@ import { deserialize } from '@deepkit/type'
     PointsModule,
     ViewersModule,
     PermissionsModule,
-    TimersModule
+    TimersModule,
+    AliasModule
   ],
   controllers: [AppController],
   providers: [
