@@ -1,13 +1,10 @@
 
 export class KickerException extends Error {
-  silent: boolean
-
   constructor(
     private readonly responseBody: string,
-    private readonly isSilent: boolean = true
+    readonly outputToChat: boolean = false
   ) {
     super()
     this.message = responseBody
-    this.silent = isSilent
   }
 }

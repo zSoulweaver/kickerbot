@@ -7,6 +7,7 @@ import { Reflector } from '@nestjs/core'
 import { DiscoveredClassWithMeta } from '@golevelup/nestjs-discovery'
 import { ValidationError } from '@deepkit/type'
 import { KickClient, MessagesMessageMetadata } from '@kickerbot/kclient'
+import { KickerException } from '../kicker.exception'
 
 type CommandGroupMap = Map<string, CommandDiscovery | CommandGroupMap>
 type CommandMap = Map<string, CommandDiscovery | CommandGroupMap>
@@ -78,6 +79,12 @@ export class CommandsService implements OnModuleInit, OnApplicationBootstrap {
         this.logger.log(`[Bot Response]: ${botResponse}`)
         await this.client.api.messages.send(chatroomId.toString(), botResponse, messageMetadata)
         return err
+      }
+      if (err instanceof KickerException) {
+        if (err.outputToChat) {
+          await this.client.api.messages.send(chatroomId.toString(), err.message, messageMetadata)
+          return err
+        }
       }
       this.logger.error(err)
       return err

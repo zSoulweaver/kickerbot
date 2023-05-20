@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core'
 import { AppModule } from './app.module'
 import { PrismaService } from './prisma.service'
+import { KickerExceptionFilter } from './kicker'
 
 async function bootstrap() {
   // const pg = new EmbeddedPostgres({
@@ -17,6 +18,8 @@ async function bootstrap() {
 
   const prismaService = app.get(PrismaService)
   await prismaService.enableShutdownHooks(app)
+
+  app.useGlobalFilters(new KickerExceptionFilter())
 
   await app.listen(3000)
 }
