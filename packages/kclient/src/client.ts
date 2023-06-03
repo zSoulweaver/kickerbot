@@ -18,17 +18,21 @@ export class KickClient extends EventEmitter<KickClientEvents> {
   private _apiClient: ApiClient
   private _wsClient: WsClient
 
-  public async initialiseApiClient(options?: { headless: boolean }) {
+  async initialiseApiClient(options?: { headless: boolean }) {
     this._apiClient = await ApiClient.create(this, options)
   }
 
-  public async authenticate(credentials: { email: string, password: string }) {
+  async authenticate(credentials: { email: string, password: string }) {
     await this._apiClient.authenticate(credentials)
   }
 
-  public async initaliseWsClient() {
+  async initaliseWsClient() {
     this._wsClient = new WsClient()
     this._wsClient.pusher.connection.bind('connected', () => this.emit('wsConnected'))
+  }
+
+  get currentUserDetails() {
+    return this._apiClient.currentUserDetails
   }
 
   get api() {

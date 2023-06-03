@@ -42,6 +42,9 @@ export class CommandsService implements OnModuleInit, OnApplicationBootstrap {
 
   public onApplicationBootstrap() {
     this.client.on('onMessage', messageData => {
+      if (this.client.currentUserDetails?.username === messageData.sender.username) {
+        return
+      }
       this.logger.log(`Received Message, [${messageData.sender.username}]: ${messageData.content}`)
       const content = messageData.content.toLowerCase()
       const prefix = '!'

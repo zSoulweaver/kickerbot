@@ -5,7 +5,7 @@ import { resolve } from 'path'
 import { outputJSON, readJson } from 'fs-extra'
 import { KickClient } from '../client'
 
-interface CurrentUserDetails {
+export interface CurrentUserDetails {
   username: string
   email: string
 }
@@ -78,9 +78,13 @@ export class ApiClient {
       }
 
       await this.context.addCookies(cookieData)
-      const user = await this._client.api.user.me()
-      if (!user?.id) {
+      const currentUser = await this._client.api.user.me()
+      if (!currentUser?.id) {
         throw new KickSessionError('Invalid session')
+      }
+      this.currentUser = {
+        username: currentUser.username,
+        email: currentUser.email
       }
     } catch (err) {
       if (err instanceof KickSessionError) {
@@ -174,5 +178,9 @@ export class ApiClient {
     } catch (err) {
       throw new Error('Unable to authenticate')
     }
+  }
+
+  get currentUserDetails() {
+    return this.currentUser
   }
 }
