@@ -4,6 +4,7 @@ import { PrismaService } from 'src/prisma.service'
 import { SettingsService } from 'src/settings/settings.service'
 import { ViewerActivityService } from 'src/viewers/viewer-activity.service'
 import { PointsSettings } from './points.settings'
+import { add, isFuture } from 'date-fns'
 
 @Injectable()
 export class PointsService {
@@ -43,15 +44,19 @@ export class PointsService {
 
   @Cron('*/30 * * * * *')
   async routineAddPoints() {
-    const activeViewers = this.viewerActivityService.activeViewers
-    if (activeViewers.size <= 0) {
+    const viewerActivity = this.viewerActivityService.viewerActivity
+    if (viewerActivity.size <= 0) {
       return
     }
 
     const pointIncrementValue = await this.settingsService.getSetting('pointsGain')
 
     const pointTransactions: any[] = []
-    for (const viewer of activeViewers) {
+    for (const viewer of viewerActivity) {
+      if (!isFuture(add(viewer[1].lastActiveAt, { seconds: 30 }))) {
+        continue
+      }
+
       pointTransactions.push(this.prisma.viewer.upsert({
         where: {
           id: viewer[0]

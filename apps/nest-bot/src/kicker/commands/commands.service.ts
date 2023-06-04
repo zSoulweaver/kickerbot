@@ -6,8 +6,9 @@ import { CommandGroupDiscovery } from './command-group.discovery'
 import { Reflector } from '@nestjs/core'
 import { DiscoveredClassWithMeta } from '@golevelup/nestjs-discovery'
 import { ValidationError } from '@deepkit/type'
-import { KickClient, MessagesMessageMetadata } from '@kickerbot/kclient'
+import { ChatMessageEvent, KickClient, MessagesMessageMetadata } from '@kickerbot/kclient'
 import { KickerException } from '../kicker.exception'
+import { ListenersService } from '../listeners'
 
 type CommandGroupMap = Map<string, CommandDiscovery | CommandGroupMap>
 type CommandMap = Map<string, CommandDiscovery | CommandGroupMap>
@@ -25,7 +26,8 @@ export class CommandsService implements OnModuleInit, OnApplicationBootstrap {
   public constructor(
     private readonly client: KickClient,
     private readonly explorerService: ExplorerService,
-    private readonly reflector: Reflector
+    private readonly reflector: Reflector,
+    private readonly listenersService: ListenersService
   ) { }
 
   public async onModuleInit() {
@@ -46,27 +48,20 @@ export class CommandsService implements OnModuleInit, OnApplicationBootstrap {
         return
       }
       this.logger.log(`Received Message, [${messageData.sender.username}]: ${messageData.content}`)
-      const content = messageData.content.toLowerCase()
-      const prefix = '!'
 
-      if (!content.startsWith(prefix)) return
+      const handler = this.resolveCommand(messageData.content)
+      if (!handler) return
 
-      const args = content.substring(prefix.length).split(/ +/g)
-
-      const handler = this.getCommandHandler(args)
-      if (!handler) {
-        return
-      }
-
-      void this.handleCommand(messageData.chatroom_id, async () => await handler.handle.execute([messageData]), messageData.getMetadata())
+      void this.handleCommand(messageData.chatroom_id, handler.handle, messageData, messageData.getMetadata())
     })
   }
 
-  public async handleCommand(chatroomId: number, func: (...args: any) => string | Promise<string>, messageMetadata?: MessagesMessageMetadata) {
+  public async handleCommand(chatroomId: number, handler: CommandDiscovery, context: ChatMessageEvent, messageMetadata?: MessagesMessageMetadata) {
     try {
-      const commandOutput = await func()
+      const commandOutput = await handler.execute([context]) as string
       this.logger.log(`[Bot Response]: ${commandOutput}`)
       await this.client.api.messages.send(chatroomId.toString(), commandOutput, messageMetadata)
+      void this.listenersService.commandExecuted(handler, context)
     } catch (err) {
       if (err instanceof ValidationError) {
         const botResponse = 'Failed to due to invalid arguments.'
@@ -92,6 +87,16 @@ export class CommandsService implements OnModuleInit, OnApplicationBootstrap {
       this.logger.error(err)
       return err
     }
+  }
+
+  public resolveCommand(chatMessage: string): CommandHandler | null {
+    const content = chatMessage.toLowerCase()
+    const prefix = '!'
+
+    if (!content.startsWith(prefix)) return null
+
+    const args = content.substring(prefix.length).split(/ +/g)
+    return this.getCommandHandler(args)
   }
 
   public getCommandHandler(args: string[]): CommandHandler | null {

@@ -14,13 +14,13 @@ export class TimersService {
     chatroomId: number,
     handler: {
       commandHandler: CommandDiscovery
-      context: Omit<ChatMessageEvent, 'getMetadata'>
+      context: ChatMessageEvent
     },
     interval: number,
     messageMetadata?: MessagesMessageMetadata
   ) {
     const intervalHandle = setInterval(() => {
-      void this.commandsService.handleCommand(chatroomId, async () => await handler.commandHandler.execute([handler.context]), messageMetadata)
+      void this.commandsService.handleCommand(chatroomId, handler.commandHandler, handler.context, messageMetadata)
     }, interval)
 
     this.timersMap.set(handler.commandHandler, intervalHandle)

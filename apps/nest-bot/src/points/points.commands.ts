@@ -8,6 +8,7 @@ import { PointsSetInput } from './dto/points-set.dto'
 import { PointsService } from './points.service'
 import { DefaultRole } from 'src/permissions/default-role.decorator'
 import { ChatMessageEvent } from '@kickerbot/kclient'
+import { CooldownGuard } from 'src/cooldown/cooldown.guard'
 
 @Injectable()
 @CommandGroup({ name: 'points' })
@@ -18,7 +19,7 @@ export class PointsCommands {
   ) { }
 
   @Command({ name: '' })
-  @UseGuards(RoleGuard)
+  @UseGuards(RoleGuard, CooldownGuard)
   async getUserPoints(
     @Arguments args: PointsGetInput,
     @Sender() sender: ChatMessageEvent['sender']
