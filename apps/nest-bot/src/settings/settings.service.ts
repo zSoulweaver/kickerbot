@@ -3,7 +3,7 @@ import { PrismaService } from 'src/prisma.service'
 import { SETTINGS_MODULE_NAME_METADATA } from './settings.constants'
 
 export type SettingsObject<T extends string> = {
-  [K in T]: string | number
+  [K in T]: string | number | boolean
 }
 
 @Injectable()
@@ -24,7 +24,7 @@ export class SettingsService<T extends string = string> {
     return moduleSetting?.value
   }
 
-  async initalSet(setting: string, value: string | number, module?: string) {
+  async initalSet(setting: T, value: string | number | boolean, module?: string) {
     await this.prisma.moduleSettings.upsert({
       where: {
         module_setting: {
@@ -41,7 +41,7 @@ export class SettingsService<T extends string = string> {
     })
   }
 
-  async set(setting: string, value: string | number, module?: string) {
+  async set(setting: T, value: string | number | boolean, module?: string) {
     const settingData = {
       module: module ?? this.moduleName,
       setting,
