@@ -30,6 +30,7 @@ export class PointsCommands {
     return `${targetUser} currenly has ${points ?? 0} ${pointName}`
   }
 
+  @UseGuards(CooldownGuard)
   @Command({ name: 'set' })
   async setUserPoints(@Arguments args: PointsSetInput) {
     await this.pointsService.setPoints(args.username, args.points)

@@ -43,3 +43,9 @@ model CommandAliases {
   target String
   alias  String @id
 }
+
+model CommandCooldown {
+  command  String  @id
+  cooldown Int
+  enabled  Boolean
+}

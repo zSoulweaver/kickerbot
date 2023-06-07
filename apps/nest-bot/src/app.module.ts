@@ -11,6 +11,7 @@ import { TypedConfigModule, fileLoader } from 'nest-typed-config'
 import { AppConfig } from './app.config'
 import { deserialize } from '@deepkit/type'
 import { AliasModule } from './alias/alias.module'
+import { CooldownModule } from './cooldown/cooldown.module'
 
 @Module({
   imports: [
@@ -24,8 +25,9 @@ import { AliasModule } from './alias/alias.module'
         return config
       }
     }),
-    KickerModule.forRoot({}),
     ScheduleModule.forRoot(),
+    KickerModule.forRoot({}),
+    CooldownModule,
     PointsModule,
     ViewersModule,
     PermissionsModule,
