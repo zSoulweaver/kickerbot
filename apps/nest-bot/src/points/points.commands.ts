@@ -12,6 +12,7 @@ import { CooldownGuard } from 'src/cooldown/cooldown.guard'
 
 @Injectable()
 @CommandGroup({ name: 'points' })
+@UseGuards(CooldownGuard, RoleGuard)
 export class PointsCommands {
   constructor(
     private readonly settingsService: SettingsService,
@@ -19,7 +20,6 @@ export class PointsCommands {
   ) { }
 
   @Command({ name: '' })
-  @UseGuards(RoleGuard, CooldownGuard)
   async getUserPoints(
     @Arguments args: PointsGetInput,
     @Sender() sender: ChatMessageEvent['sender']
@@ -30,7 +30,6 @@ export class PointsCommands {
     return `${targetUser} currenly has ${points ?? 0} ${pointName}`
   }
 
-  @UseGuards(CooldownGuard)
   @Command({ name: 'set' })
   async setUserPoints(@Arguments args: PointsSetInput) {
     await this.pointsService.setPoints(args.username, args.points)
