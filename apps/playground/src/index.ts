@@ -4,12 +4,16 @@ import { KickClient } from '@kickerbot/kclient'
 async function main() {
   try {
     const client = new KickClient()
-    await client.initialiseApiClient()
+    await client.initialiseApiClient({
+      headless: false
+    })
 
     await client.authenticate({
       email: process.env.kick_email as string,
       password: process.env.kick_password as string
     })
+
+    await client.initaliseWsClient()
 
     await client.ws.chatroom.listenToChatroom('2915325')
 

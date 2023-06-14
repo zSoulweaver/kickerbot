@@ -21,10 +21,10 @@
   "dependencies": {
     "@deepkit/type": "1.0.1-alpha.92",
     "fs-extra": "^11.1.1",
-    "playwright": "^1.32.2",
+    "playwright": "^1.35.0",
     "playwright-extra": "^4.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2",
-    "pusher-js": "^8.0.2",
-    "tseep": "^1.0.5"
+    "pusher-js": "^8.1.0",
+    "tseep": "^1.1.1"
   }
 }

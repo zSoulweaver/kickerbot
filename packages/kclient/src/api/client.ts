@@ -55,7 +55,7 @@ export class ApiClient {
   private async initialiseBrowser(options?: { headless: boolean }) {
     this.browser = await chromium.launch({
       headless: options?.headless ?? true,
-      devtools: options?.headless ?? false
+      devtools: true
     })
     this.context = await this.browser.newContext()
     this.page = await this.context.newPage()
@@ -104,18 +104,7 @@ export class ApiClient {
   }
 
   async browserFetch(url: string, fetchOptions?: RequestInit): Promise<Response> {
-    const cookies = await this.context.cookies()
-    let xsrfToken = cookies.find(x => x.name === 'XSRF-TOKEN')?.value
-    if (xsrfToken !== undefined) {
-      xsrfToken = decodeURIComponent(xsrfToken)
-    }
-
     return await new Promise((resolve, reject) => {
-      if (xsrfToken === undefined) {
-        reject(new Error('Unable to get token from cookies'))
-        return
-      }
-
       const handler = (res: Response) => {
         void (async () => {
           if (res.url().endsWith(url)) {
@@ -130,14 +119,25 @@ export class ApiClient {
         headers: {
           Accept: 'application/json, text/plain, */*',
           'accept-language': 'en-GB',
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${xsrfToken}`,
-          'X-XSRF-TOKEN': xsrfToken
+          'Content-Type': 'application/json'
         }
       }
 
       // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
       void this.page.evaluate<void, [string, RequestInit]>(([url, fetchOptions]) => {
+        function getCookie(name: string) {
+          const value = `; ${document.cookie}`
+          const parts = value.split(`; ${name}=`)
+          if (parts.length === 2) return parts.pop()?.split(';').shift()
+        }
+
+        let xsrfToken = getCookie('XSRF-TOKEN')
+        if (xsrfToken) {
+          xsrfToken = decodeURIComponent(xsrfToken);
+          (fetchOptions.headers as Record<string, string>).Authorization = `Bearer ${xsrfToken}`;
+          (fetchOptions.headers as Record<string, string>)['X-XSRF-TOKEN'] = xsrfToken
+        }
+
         void fetch(url, fetchOptions)
       }, [url, { ...defaultOptions, ...fetchOptions }])
 
