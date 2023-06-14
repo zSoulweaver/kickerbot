@@ -22,6 +22,7 @@ interface CommandHandler {
 export class CommandsService implements OnModuleInit, OnApplicationBootstrap {
   private readonly logger = new Logger(CommandsService.name)
   private readonly commands: CommandMap = new Map()
+  private readonly commandGroups: Array<{ name: string, description?: string }> = []
 
   public constructor(
     private readonly client: KickClient,
@@ -34,6 +35,10 @@ export class CommandsService implements OnModuleInit, OnApplicationBootstrap {
     const commandGroups = await this.explorerService.exploreProviders<CommandGroupDiscovery>(COMMAND_GROUP_METADATA)
     for (const commandGroup of commandGroups) {
       await this.addCommandGroup(commandGroup)
+      this.commandGroups.push({
+        name: commandGroup.meta.getName(),
+        description: commandGroup.meta.getDescription()
+      })
     }
 
     const commands = await this.explorerService.explore<CommandDiscovery>(COMMAND_METADATA)
@@ -210,5 +215,71 @@ export class CommandsService implements OnModuleInit, OnApplicationBootstrap {
 
   public getElement(name: string) {
     return this.commands.get(name.toLowerCase())
+  }
+
+  public convertMapToObject(map, rootGroup = '') {
+    const result: any[] = []
+
+    if (rootGroup) {
+      const value = map.get(rootGroup)
+      if (value instanceof CommandDiscovery) {
+        result.push({
+          command: rootGroup,
+          description: value.getDescription()
+        })
+      } else {
+        const commands = this.traverseMap(value, rootGroup)
+        const groupInfo = this.commandGroups.find(x => x.name === rootGroup)
+        result.push({
+          commandGroup: rootGroup,
+          description: groupInfo?.description,
+          commands
+        })
+      }
+    } else {
+      for (const [key, value] of map) {
+        if (value instanceof CommandDiscovery) {
+          result.push({
+            command: key,
+            description: value.getDescription()
+          })
+        } else {
+          const commands = this.traverseMap(value, key)
+          const groupInfo = this.commandGroups.find(x => x.name === key)
+          result.push({
+            commandGroup: key,
+            description: groupInfo?.description,
+            commands
+          })
+        }
+      }
+    }
+
+    return result
+  }
+
+  private traverseMap(map: CommandGroupMap, prefix: string) {
+    let commands: any[] = []
+
+    for (const [key, value] of map) {
+      if (value instanceof CommandDiscovery) {
+        commands.push({
+          command: `${prefix} ${key}`.trim(),
+          description: value.getDescription()
+        })
+      } else {
+        commands = commands.concat(this.traverseMap(value, `${prefix} ${key}`.trim()))
+      }
+    }
+
+    return commands
+  }
+
+  get commandList() {
+    return this.commands
+  }
+
+  get commandListJSON() {
+    return this.convertMapToObject(this.commands)
   }
 }
